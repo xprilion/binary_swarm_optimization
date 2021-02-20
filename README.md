@@ -64,6 +64,3 @@ print("BGA:\n\t{0}   {1}  {2}".format("".join(map(str,g)),s,l))
 * minf: minimization flag. min or max?(bool)
 * prog: Do you use progress bar?(bool)<p>
 <br><p>
-
-##### Additional notes
-In my research, I proposed reducing the feature dimension from half to one-third without substantially decreasing the evaluation by giving a penalty equivalent to the number of features to the evaluation formula at feature selection.

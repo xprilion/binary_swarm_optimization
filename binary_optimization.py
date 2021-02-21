@@ -61,38 +61,30 @@ def suddn(li,n_li,num):
 
 
 def plot_history(history):
-    max_gen_particles = 0
-    for i in range(len(history)):
-        l = len(history[i].keys())
-        if l > max_gen_particles:
-            max_gen_particles = l
-    
-    fig, ax = plt.subplots(figsize=(9, max_gen_particles))
-    labels = ["Particle " + str(x) for x in range(max_gen_particles+1)]
-    ax.set_xlim(0, 13)
-    ax.set_ylim(0, max_gen_particles)
+    fig, ax = plt.subplots(figsize=(9, 10))
+    labels = ["Particle " + str(x) for x in range(0, 11)]
+    labels.insert(0, "...")
+    ax.set_xlim(0, 14)
+    ax.set_ylim(0, 11)
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.set_yticklabels(labels)
-    xdata, ydata = [], []
     ln, = plt.plot([], [], 'ro')
 
     def update(frame_history):
-        sorted_history = {k: v for k, v in sorted(frame_history.items(), key=lambda item: item[1])}
-        keys = list(sorted_history.keys())
+        sorted_history = {k: v for k, v in sorted(frame_history.items(), key=lambda item: item[1], reverse=True)}
+        keys = list(sorted_history.keys())[:10]
         frame_x, frame_y = [], []
         for index in range(len(keys)):
             k = keys[index]
             k_x, k_y = [], []
             for ci in range(len(k)):
                 if k[ci] == 1:
-                    k_x.append(ci)
-                    k_y.append(index)
+                    k_x.append(ci+1)
+                    k_y.append(10 - index)
             frame_x.extend(k_x)
             frame_y.extend(k_y)
-        xdata.append(frame_x)
-        ydata.append(frame_y)
-        ln.set_data(xdata, ydata)
+        ln.set_data(frame_x, frame_y)
         return ln,
 
     ani = animation.FuncAnimation(fig, update, frames=history, blit=True)
@@ -136,17 +128,19 @@ def BGA(Eval_Func,n=20,m_i=300,mutation=0.05,minf=0,dim=None,prog=False):
     history = []
 
     for it in miter:
+        t_gen = {}
         for i,gen in enumerate(gens):
             if tuple(gen) in gens_dict:
-                v=gens_dict[tuple(gen)]
+                score=gens_dict[tuple(gen)]
             else:
                 score=estimate(gen)
                 gens_dict[tuple(gen)]=score
-            history.append(gens_dict)
             fit[i]=score
+            t_gen[tuple(gen)] = score
             if best_val < score if minf==0 else best_val > score:
                 best_val=dc(score)
                 best_pos=dc(gen)
+        history.append(t_gen)
         alter_gens=sorted(gens,reverse=True)[:2]
         t1=random.randint(1,len(gens[0])-2)
         t2=random.randint(t1,len(gens[0])-1)
@@ -217,8 +211,10 @@ def BPSO(Eval_Func,n=20,m_i=200,minf=0,dim=None,prog=False,w1=0.5,c1=1,c2=1,vmax
     else:
         miter=range(m_i)
 
+    history = []
     for it in miter:
         #w=0.5
+        t_gen = {}
         for i in range(n):
             if tuple(gens[i]) in gens_dict:
                 score=gens_dict[tuple(gens[i])]
@@ -226,10 +222,11 @@ def BPSO(Eval_Func,n=20,m_i=200,minf=0,dim=None,prog=False,w1=0.5,c1=1,c2=1,vmax
                 score=estimate(gens[i])
                 gens_dict[tuple(gens[i])]=score
             fit[i]=score
+            t_gen[tuple(gens[i])] = score
             if fit[i]>pbest[i] if minf==0 else fit[i]<pbest[i]:#max
                 pbest[i]=dc(fit[i])
                 xpbest[i]=dc(gens[i])
-
+        history.append(t_gen)
         if minf==0:
             gg=max(fit)
             xgg=gens[fit.index(max(fit))]
@@ -282,7 +279,7 @@ def BPSO(Eval_Func,n=20,m_i=200,minf=0,dim=None,prog=False,w1=0.5,c1=1,c2=1,vmax
                     gens[i][j]= 0 if gens[i][j] ==1 else 1
                 else:
                     pass
-    return gbest,xgbest,xgbest.count(1)
+    return gbest,xgbest,xgbest.count(1),  plot_history(history)
 
 """BCS"""
 def sigmoid(x):
@@ -334,17 +331,20 @@ def BCS(Eval_Func,m_i=200,n=20,minf=0,dim=None,prog=False,alpha=0.1,beta=1.5,par
         miter=tqdm(range(m_i))
     else:
         miter=range(m_i)
+    history = []
     for it in miter:
+        t_gen = {}
         for i,g in enumerate(gens):
             if tuple(g) in gens_dict:
                 score=gens_dict[tuple(g)]
             else:
                 score=estimate(g)
                 gens_dict[tuple(g)]=score
+            t_gen[tuple(g)] = score
             if score > fit[i] if minf==0 else score < fit[i]:
                 fit[i]=score
                 pos[i]=g
-
+        history.append(t_gen)
         maxfit,maxind=max(fit),fit.index(max(fit))
         minfit,minind=min(fit),fit.index(min(fit))
         if minf==0:
@@ -372,7 +372,7 @@ def BCS(Eval_Func,m_i=200,n=20,minf=0,dim=None,prog=False,alpha=0.1,beta=1.5,par
                     g[d]=1
                 else:
                     g[d]=0
-    return g_val,g_pos,g_pos.count(1)
+    return g_val,g_pos,g_pos.count(1), plot_history(history)
 
 """BFFA"""
 def exchange_binary(binary,score):#,alpha,beta,gamma,r):
@@ -447,8 +447,10 @@ def BFFA(Eval_Func,n=20,m_i=25,minf=0,dim=None,prog=False,gamma=1.0,beta=0.20,al
         miter=tqdm(range(m_i))
     else:
         miter=range(m_i)
+    history = []
     for it in miter:
         for i,x in enumerate(gens):
+            t_gen = {}
             for j,y in enumerate(gens):
                 if gens_dict[tuple(y)] < gens_dict[tuple(x)]:
                     gens[j]=exchange_binary(y,gens_dict[tuple(y)])
@@ -458,10 +460,12 @@ def BFFA(Eval_Func,n=20,m_i=25,minf=0,dim=None,prog=False,gamma=1.0,beta=0.20,al
                 else:
                     score=estimate(gens[j])
                     gens_dict[tuple(gen)]=score
+                t_gen[tuple(gen)] = score
                 if score > global_best if minf==0 else score < global_best:
                     global_best=score
                     global_position=dc(gen)
-    return global_best,global_position,global_position.count(1)
+            history.append(t_gen)
+    return global_best,global_position,global_position.count(1), plot_history(history)
 
 """BGSA"""
 def Bmove(x,a,v):
@@ -558,15 +562,17 @@ def BGSA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False,EC=1,Rp=1,f_ind=25):
         miter=tqdm(range(m_i))
     else:
         miter=range(m_i)
-
+    history = []
     for it in miter:
+        t_gen = {}
         for g_i in range(n):
             if  tuple(gens[g_i]) in gens_dic:
                 fit[g_i]=gens_dic[tuple(gens[g_i])]
             else:
                 fit[g_i]=estimate(gens[g_i])
                 gens_dic[tuple(gens[g_i])]=fit[g_i]
-
+            t_gen[tuple(gens[g_i])]=fit[g_i]
+        history.append(t_gen)
         if it > 1:
             if minf==1:
                 pass
@@ -611,7 +617,7 @@ def BGSA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False,EC=1,Rp=1,f_ind=25):
         fitold=dc(fit)
 
         gens,v=Bmove(gens,a,v)
-    return fbest,lbest,lbest.count(1)
+    return fbest,lbest,lbest.count(1), plot_history(history)
 
 """BBA"""
 def BBA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False,qmin=0,qmax=2,loud_A=0.25,r=0.4):
@@ -672,8 +678,10 @@ def BBA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False,qmin=0,qmax=2,loud_A=0
     else:
         miter=range(m_i)
 
+    history = []
     for it in miter:
         #cgc[i]=maxf
+        t_gen = {}
         for i in range(n):
             for j in range(dim):
                 q[i]=qmin+(qmin-qmax)*random.random()
@@ -694,6 +702,8 @@ def BBA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False,qmin=0,qmax=2,loud_A=0
             else:
                 fnew=estimate(gens[i])
                 gens_dic[tuple(gens[i])]=fnew
+                
+            t_gen[tuple(gens[i])]=fnew
 
             if fnew >= fit[i] and random.random() < loud_A if minf==0 else fnew <= fit[i] and random.random() < loud_A:#max?
                 gens[i]=gens[i]
@@ -702,8 +712,9 @@ def BBA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False,qmin=0,qmax=2,loud_A=0
             if fnew>best_v if minf==0 else fnew<best_v:
                 best_s=dc(gens[i])
                 best_v=dc(fnew)
+        history.append(t_gen)
 
-    return best_v,best_s,best_s.count(1)
+    return best_v,best_s,best_s.count(1), plot_history(history)
 
 """BDFA"""
 def BDFA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False):
@@ -743,7 +754,10 @@ def BDFA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False):
         miter=tqdm(range(m_i))
     else:
         miter=range(m_i)
+        
+    history = []
     for it in miter:
+        t_gen = {}
         w=0.9 - it * ((0.9-0.4) / maxiter)
         mc=0.1- it * ((0.1-0) / (maxiter/2))
         if mc < 0:
@@ -759,9 +773,11 @@ def BDFA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False):
         for i in range(n):
             if tuple(genes[i]) in gens_dict:
                 fit[i]=gens_dict[tuple(genes[i])]
+                t_gen[tuple(genes[i])] = fit[i]
             else:
                 fit[i]=estimate(genes[i])
                 gens_dict[tuple(genes[i])]=dc(fit[i])
+                t_gen[tuple(genes[i])] = dc(fit[i])
             if fit[i] > food_fit if minf==0 else fit[i] < food_fit:
                 food_fit=dc(fit[i])
                 food_pos=dc(genes[i])
@@ -769,6 +785,8 @@ def BDFA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False):
             if fit[i] > enemy_fit if minf==0 else fit[i] < enemy_fit:
                 enemy_fit=dc(fit[i])
                 enemy_pos=dc(genes[i])
+                
+        history.append(t_gen)
 
         for i in range(n):
             ind=-1
@@ -810,4 +828,4 @@ def BDFA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False):
     best_p=food_pos
     best_v=food_fit
 
-    return best_v,best_p,best_p.count(1)
+    return best_v,best_p,best_p.count(1), plot_history(history)

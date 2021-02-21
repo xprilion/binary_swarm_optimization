@@ -1,9 +1,6 @@
 # binary_swarm_intelligence
  Library of binary swarm intelligence mainly used for obtaining optimal solution of feature selection
 
-This Python library is a summary of the algorithms I used for my graduation research at bachelor.
-
-
 ## The implemented algorithm
 * Binary Genetic Algorithm
 * Binary Particle Swarm optimization

@@ -44,7 +44,7 @@ def random_search(n,dim):
     return gens
 
 """BGA"""
-def suddn(li,n_li,num):#突然変異
+def suddn(li,n_li,num):
     l1= [random.choice(n_li) for i in range(num)]
     l2= [random.choice([0,1]) for i in range(num)]
     al_li=dc(li)
@@ -76,7 +76,7 @@ def BGA(Eval_Func,n=20,m_i=300,mutation=0.05,minf=0,dim=None,prog=False):
     fit=[0 for i in range(n)]
     num_li=range(dim)
     #flag=dr
-    best_val=float("-inf") if minf == 0 else float("inf")#minf==0のときは最大化なので-infを初期ベストにし、全部0の部分集合を初期ベストにする
+    best_val=float("-inf") if minf == 0 else float("inf")
     best_pos=[0]*dim
     gens_dict={tuple([0]*dim):float("-inf") if minf == 0 else float("inf")}
     prop=mutation
@@ -415,12 +415,11 @@ def BFFA(Eval_Func,n=20,m_i=25,minf=0,dim=None,prog=False,gamma=1.0,beta=0.20,al
 
 """BGSA"""
 def Bmove(x,a,v):
-    n,dim=len(x),len(x[0])#size(x)#次元がかえってくる20,13（群数,特徴次元）
-    v=[[random.random()*v[j][i]+a[i] for i in range(dim)] for j in range(n)]#rand(n,nn).*v+a#要素ごとの乗算#randは次元数分のrand配列
+    n,dim=len(x),len(x[0])
+    v=[[random.random()*v[j][i]+a[i] for i in range(dim)] for j in range(n)]
     s=[[abs(math.tanh(_v)) for _v in vv ] for vv in v]
-    temp=[[1 if rr<ss else 0 for rr,ss in zip(_r,_s)] for _r,_s in zip([[random.random() for i in range(dim)] for j in range(n)],s)]# < s:#s以上なら1,
-    x_moving=[[0 if temp[ind][i]==1 else 1  for i in range(len(temp[ind])) ] for ind in range(len(temp))]#find(t==1)#1のインデックス番号求めてそれの逆~にする
-    #xm(moving)=~xm(moving)
+    temp=[[1 if rr<ss else 0 for rr,ss in zip(_r,_s)] for _r,_s in zip([[random.random() for i in range(dim)] for j in range(n)],s)]
+    x_moving=[[0 if temp[ind][i]==1 else 1  for i in range(len(temp[ind])) ] for ind in range(len(temp))]
     return x_moving,v
 
 def mc(fit,min_f):
@@ -448,7 +447,7 @@ def BGc(itertion,max_iter):
     return g
 
 def BGf(m,x,G,Rp,EC,itertion,max_iter):
-    n,dim=len(x),len(x[0])#size(x)#n=群数,dim=次元数
+    n,dim=len(x),len(x[0])
     final_per=2#In the last iteration, only 2 percent of agents apply force to the others
     if EC == 1:
         kbest=final_per+(1-itertion/max_iter)*(100-final_per)
@@ -457,7 +456,7 @@ def BGf(m,x,G,Rp,EC,itertion,max_iter):
         kbest=n
     mm=np.array(m)
     am=[np.argsort(mm)[::-1][i] for i in range(len(mm))]#:
-    ds=sorted(am,reverse=True)#降順
+    ds=sorted(am,reverse=True)
 
     for i in range(n):
         E=[0 for i in range(dim)]#zero(1,dim)
@@ -498,13 +497,9 @@ def BGSA(Eval_Func,n=20,m_i=200,dim=None,minf=0,prog=False,EC=1,Rp=1,f_ind=25):
     best_bin='0'*dim
     fbest=float("-inf") if minf == 0 else float("inf")
     best_val=float("-inf") if minf == 0 else float("inf")
-    #EC=1
-    #Rp=1
-    #f_ind=25#24: max-ones, 25: royal-road(王道)
-    #minf=minf#0#1:mini,0:maximization
     gens_dic={tuple([0]*dim):float("-inf") if minf == 0 else float("inf")}
     #flag=dr#False
-    gens=random_search(n,dim)#[[random.choice([0,1]) for _ in range(dim)] for i in range(n)]
+    gens=random_search(n,dim)
     bestc=[]
     meanc=[]
     v=[[0 for d in range(dim)] for i in range(n)]

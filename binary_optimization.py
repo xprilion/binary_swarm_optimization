@@ -5,6 +5,12 @@ from itertools import combinations as cb
 import math
 from copy import deepcopy as dc
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+from matplotlib import animation, rc
+import itertools
+import numpy as np
+
 
 """Using Algorithm
 * Binary Genetic Algorithm
@@ -53,6 +59,47 @@ def suddn(li,n_li,num):
     #li=''.join(_d)
     return al_li
 
+
+def plot_history(history):
+    max_gen_particles = 0
+    for i in range(len(history)):
+        l = len(history[i].keys())
+        if l > max_gen_particles:
+            max_gen_particles = l
+    
+    fig, ax = plt.subplots(figsize=(9, max_gen_particles))
+    labels = ["Particle " + str(x) for x in range(max_gen_particles+1)]
+    ax.set_xlim(0, 13)
+    ax.set_ylim(0, max_gen_particles)
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    ax.set_yticklabels(labels)
+    xdata, ydata = [], []
+    ln, = plt.plot([], [], 'ro')
+
+    def update(frame_history):
+        sorted_history = {k: v for k, v in sorted(frame_history.items(), key=lambda item: item[1])}
+        keys = list(sorted_history.keys())
+        frame_x, frame_y = [], []
+        for index in range(len(keys)):
+            k = keys[index]
+            k_x, k_y = [], []
+            for ci in range(len(k)):
+                if k[ci] == 1:
+                    k_x.append(ci)
+                    k_y.append(index)
+            frame_x.extend(k_x)
+            frame_y.extend(k_y)
+        xdata.append(frame_x)
+        ydata.append(frame_y)
+        ln.set_data(xdata, ydata)
+        return ln,
+
+    ani = animation.FuncAnimation(fig, update, frames=history, blit=True)
+    
+    return ani
+
+
 def BGA(Eval_Func,n=20,m_i=300,mutation=0.05,minf=0,dim=None,prog=False):
     """
     input:{ Eval_Func: Evaluate_Function, type is class
@@ -85,6 +132,8 @@ def BGA(Eval_Func,n=20,m_i=300,mutation=0.05,minf=0,dim=None,prog=False):
         miter=tqdm(range(m_i))
     else:
         miter=range(m_i)
+        
+    history = []
 
     for it in miter:
         for i,gen in enumerate(gens):
@@ -93,6 +142,7 @@ def BGA(Eval_Func,n=20,m_i=300,mutation=0.05,minf=0,dim=None,prog=False):
             else:
                 score=estimate(gen)
                 gens_dict[tuple(gen)]=score
+            history.append(gens_dict)
             fit[i]=score
             if best_val < score if minf==0 else best_val > score:
                 best_val=dc(score)
@@ -109,7 +159,7 @@ def BGA(Eval_Func,n=20,m_i=300,mutation=0.05,minf=0,dim=None,prog=False):
         gens.extend(qgens)
         gens.append(alter_gens[0])
         gens.append(alter_gens[1])
-    return best_val,best_pos,best_pos.count(1)
+    return best_val,best_pos,best_pos.count(1), plot_history(history)
 
 """BPSO"""
 def logsig(n): return 1 / (1 + math.exp(-n))

@@ -49,8 +49,8 @@ class Evaluate:
 
 results = {}
 
-max_iters = 20
-number_of_particles = 20
+max_iters = 1000
+number_of_particles = 100
 results["BGA"] = opt.BGA(Eval_Func=Evaluate,n=number_of_particles,m_i=max_iters)
 results["BPSO"] = opt.BPSO(Eval_Func=Evaluate,n=number_of_particles,m_i=max_iters)
 results["BCS"] = opt.BCS(Eval_Func=Evaluate,n=number_of_particles,m_i=max_iters)

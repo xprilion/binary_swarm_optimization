@@ -1,0 +1,42 @@
+
+########################################################################
+#      Date:           Mon Feb 22 10:37:12 PST 2021
+#    Job ID:           799317.v-qsvr-1.aidevcloud
+#      User:           u61933
+# Resources:           neednodes=1:batch:ppn=2,nodes=1:batch:ppn=2,walltime=06:00:00
+########################################################################
+
+:: WARNING: setvars.sh has already been run. Skipping re-execution.
+   To force a re-execution of setvars.sh, use the '--force' option.
+   Using '--force' can result in excessive use of your environment variables.
+* Hello world from compute server s001-n021!
+* The current directory is /home/u61933/bso.
+* Compute server's CPU model and number of logical CPUs:
+CPU(s):              24
+Model name:          Intel(R) Xeon(R) Gold 6128 CPU @ 3.40GHz
+* Python available to us:
+/opt/intel/inteloneapi/intelpython/latest/bin/python
+Python 3.7.9 :: Intel Corporation
+Algorithm:
+	best_features         best_val      number_of_1s      test_score
+BGA:
+	1011001100100          0.957516           6             0.890187
+BPSO:
+	1111001000100          0.971405           6             0.878505
+BCS:
+	0001001111000          0.958333           5             0.904206
+BFFA:
+	1011001010110          0.972222           7             0.906542
+BBA:
+	0001001101100          0.958333           5             0.890187
+BGSA:
+	0001001011000          0.944444           4             0.904206
+BDFA:
+	1011001110100          0.972222           7             0.899533
+*Bye
+
+########################################################################
+# End of output for job 799317.v-qsvr-1.aidevcloud
+# Date: Mon Feb 22 10:52:30 PST 2021
+########################################################################
+

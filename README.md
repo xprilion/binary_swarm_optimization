@@ -61,3 +61,18 @@ print("BGA:\n\t{0}   {1}  {2}".format("".join(map(str,g)),s,l))
 * minf: minimization flag. min or max?(bool)
 * prog: Do you use progress bar?(bool)<p>
 <br><p>
+
+
+## Experience with DPC++
+
+### The Good
+
+I was able to work with DPC++ and was excited to see how fast it made my computations work. The best part, it was a good write once run everywhere experience, having had almost no trouble running in DevCloud the code I had developed on my Macbook.
+
+## Ths Bad
+
+I am fairly new to C++, hence I had difficulty building more complex systems using DPC++. However, I am very much looking forward for a Python wrapper of DPC++ libraries.
+
+## The Ugly
+
+At times DevCloud behaved very slow, and it was frustrating.
